@@ -174,7 +174,7 @@ const filteredCustomers = customers
       <main className="my-10 w-full md:max-w-2xl">
 
         <h1 className="text-4xl font-medium text-white flex justify-center">Usuários</h1>
-      <button className="cursor-pointer w-full p-2 mb-5 bg-green-400 rounded font-medium mt-9 mb-9 hover:bg-green-700" onClick={handleOpenModal}>Cadastrar</button>
+      <button className="cursor-pointer w-full p-2 bg-green-400 rounded font-medium mt-9 mb-9 hover:bg-green-700" onClick={handleOpenModal}>Cadastrar</button>
 <input
   type="date"
   value={startDate}
