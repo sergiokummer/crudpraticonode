@@ -12,7 +12,7 @@ const customStyles = {
     left: 0,
     right: 0,
     bottom: 0,
-
+    backgroundColor: ""
   },
   content: {
     position: 'absolute',
@@ -41,36 +41,46 @@ interface CustomerProps{
 export default function App() {
   const [editModalIsOpen, setEditModalIsOpen] = useState(false);
   const [updatedData, setUpdatedData] = useState<{ name?: string; email?: string; phone?: number }>({});
-  const [customers, setCustomers] = useState<CustomerProps[]>([])
-  const nameRef = useRef<HTMLInputElement | null>(null)
-  const emailRef = useRef<HTMLInputElement | null>(null)
-  const phoneRef = useRef<HTMLInputElement | null>(null)
+  const [customers, setCustomers] = useState<CustomerProps[]>([]);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const phoneRef = useRef<HTMLInputElement | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [modalIsOpen, setIsOpen] = useState(false)
+  const [modalIsOpen, setIsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [filterPeriod] = useState<'day' | 'week' | 'month' | 'all'>('all');
+  const [filterPeriod, setFilterPeriod] = useState<'custom' | 'all'>('all');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
 
 
+  function handleSearchTerm(e){
+    const query = e.target.value;
+    setSearchTerm(query);
+    fetchCustomers(query);
+    console.log(customers)
+  }
+
+  function handlePeriodFilter(e){
+    setEndDate(e.target.value);
+    setFilterPeriod("custom");
+  }
+
   function handleOpenModal(){
-    setIsOpen(true)
+    setIsOpen(true);
   }
   function handleCloseModal(){
-    setIsOpen(false)
+    setIsOpen(false);
   }
 
+  const fetchCustomers = async (query) => {
+    const endpoint =  query ? `/customers?name=${query}` : '/customers';
+    const response = await api.get(endpoint);
+    setCustomers(response.data);
+  };
   useEffect(() => {
-
-    loadCustomers();
-    const fetchCustomers = async () => {
-      const response = await api.get('/customers');
-      setCustomers(response.data);
-    };
-
-    fetchCustomers();
+    fetchCustomers(null);
   }, []);
 
   function handleOpenEditModal(id: string) {
@@ -134,26 +144,19 @@ export default function App() {
 
 
 const filteredCustomers = customers
-  .filter((customer) =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // .filter((customer) =>
+  //   customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // )
   .filter((customer) => {
     const createdAt = new Date(customer.created_at);
 
+    console.log(filterPeriod)
 
-    if (filterPeriod === 'all' && startDate !== undefined && endDate !== undefined) {
+    if (filterPeriod !== 'all' && startDate !== undefined && endDate !== undefined) {
       const startDateObj = new Date(startDate);
       const endDateObj = new Date(endDate + 'T23:59:59');
 
       return createdAt >= startDateObj && createdAt <= endDateObj;
-    }
-
-    if (filterPeriod === 'day') {
-      return isSameDay(createdAt, new Date());
-    } else if (filterPeriod === 'week') {
-      return isSameWeek(createdAt, new Date());
-    } else if (filterPeriod === 'month') {
-      return isSameMonth(createdAt, new Date());
     }
 
     return true;
@@ -184,7 +187,7 @@ const filteredCustomers = customers
 <input
   type="date"
   value={endDate}
-  onChange={(e) => setEndDate(e.target.value)}
+  onChange={(e) => handlePeriodFilter(e)}
   className="w-1/2 mb-2 p-2"
 />
 
@@ -235,6 +238,7 @@ const filteredCustomers = customers
       </Modal>
 
       <Modal isOpen={editModalIsOpen} onRequestClose={() => setEditModalIsOpen(false)}style={customStyles}>
+          <h1 className='text-4xl font-medium text-white flex justify-center'>Edite seu Usuário</h1>
         <form className="flex flex-col my-6" onSubmit={() => handleUpdate(selectedCustomerId)}>
           <label className="font-medium text-white">Nome:</label>
           <input
@@ -281,7 +285,7 @@ const filteredCustomers = customers
         type="text"
         placeholder="Pesquisar por nome"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => handleSearchTerm(e)        }
         className="w-full mb-5 p-2"
 />
      {filteredCustomers.map( (customer)=>(

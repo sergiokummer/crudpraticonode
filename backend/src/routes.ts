@@ -7,7 +7,7 @@ import { UpdateCustomerController } from "./controllers/UpdateCustomerController
 
 export async function routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   interface QueryParameters {
-    nome?: string;
+    name?: string;
 
   }
 

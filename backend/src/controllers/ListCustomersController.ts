@@ -2,19 +2,19 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { ListCustomersService } from "../services/ListCustomersService";
 
 interface QueryParameters {
-  nome?: string;
+  name?: string;
 }
 
 class ListCustomersController {
   async handle(request: FastifyRequest<{ Querystring: QueryParameters }>, reply: FastifyReply) {
     try {
-      const { nome } = request.query;
+      const { name } = request.query;
 
       const listCustomerService = new ListCustomersService();
       let customers;
 
-      if (nome) {
-        customers = await listCustomerService.searchByName(nome);
+      if (name) {
+        customers = await listCustomerService.searchByName(name);
       } else {
         customers = await listCustomerService.execute();
       }

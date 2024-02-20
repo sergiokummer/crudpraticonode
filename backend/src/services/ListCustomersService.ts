@@ -1,8 +1,9 @@
 import prismaClient from "../prisma";
 
 interface SearchByNameQuery {
-  nome: {
+  name: {
     contains: string;
+
   };
 }
 
@@ -12,10 +13,11 @@ class ListCustomersService {
     return customers;
   }
 
-  async searchByName(nome: string) {
+  async searchByName(name: string) {
     const query: SearchByNameQuery = {
-      nome: {
-        contains: nome,
+      name: {
+        contains: name,
+        mode: "insensitive"
       },
     };
 
